@@ -1,0 +1,32 @@
+﻿@model CommunityComplaints.Models.Rating
+
+<h2>Rate Complaint</h2>
+
+<form asp-action="Create" method="post">
+
+    <!-- ComplaintId hidden -->
+    <input type="hidden" name="ComplaintId" value="@ViewBag.ComplaintId" />
+
+    <!-- Stars -->
+    <label>Stars</label>
+    <select name="Stars" class="form-control">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+
+    <br />
+
+    <!-- Feedback -->
+    <label>Feedback</label>
+    <textarea name="Feedback" class="form-control"></textarea>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">
+        Submit Rating
+    </button>
+
+</form>

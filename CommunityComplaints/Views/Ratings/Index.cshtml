@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CommunityComplaints.Models.Rating>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Stars)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Feedback)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Complaint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Resident)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Stars)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Feedback)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Complaint.ComplaintId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Resident.UserId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RatingId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RatingId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RatingId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

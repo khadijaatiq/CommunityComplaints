@@ -1,0 +1,111 @@
+﻿@model IEnumerable<CommunityComplaints.Models.Announcement>
+
+@{
+    ViewBag.Title = "Announcements";
+
+    var roleId = Context.Session.GetInt32("RoleId") ?? 0;
+    var readList = ViewBag.ReadIds as List<int> ?? new List<int>();
+    var readCounts = ViewBag.ReadCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<h2>Announcements</h2>
+
+@if (roleId == 1)
+{
+    <a class="btn btn-primary mb-3" asp-action="Create">
+        + Create Announcement
+    </a>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Body</th>
+            <th>Expiry</th>
+            <th>Status</th>
+
+            @if (roleId == 2)
+            {
+                <th>Action</th>
+            }
+
+            @if (roleId == 1)
+            {
+                <th>Reads</th>
+                <th>Admin</th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            // FIXED STATUS LOGIC (IMPORTANT)
+            var isActive = item.IsActive &&
+                           (!item.ExpiresAt.HasValue || item.ExpiresAt > DateTime.Now);
+
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Body</td>
+
+                <td>
+                    @(item.ExpiresAt?.ToString("yyyy-MM-dd HH:mm") ?? "No expiry")
+                </td>
+
+                <td>
+                    @if (isActive)
+                    {
+                        <span class="text-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Inactive</span>
+                    }
+                </td>
+
+                @* ================= RESIDENT VIEW ================= *@
+                @if (roleId == 2)
+                {
+                    <td>
+                        @if (readList.Contains(item.AnnouncementId))
+                        {
+                            <span class="text-success">✔ Read</span>
+                        }
+                        else
+                        {
+                            <a asp-action="MarkRead"
+                                   asp-route-id="@item.AnnouncementId"
+                                   class="btn btn-sm btn-primary">
+                                Mark as Read
+                            </a>
+                        }
+                    </td>
+                }
+
+                @* ================= STAFF VIEW ================= *@
+                @if (roleId == 1)
+                {
+                    <td>
+                        @(readCounts.ContainsKey(item.AnnouncementId)
+                            ? readCounts[item.AnnouncementId]
+                            : 0)
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit"
+                               asp-route-id="@item.AnnouncementId">
+                            Edit
+                        </a>
+                        |
+                        <a asp-action="Deactivate"
+                               asp-route-id="@item.AnnouncementId"
+                               onclick="return confirm('Are you sure you want to deactivate this announcement?');">
+                            Deactivate
+                        </a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

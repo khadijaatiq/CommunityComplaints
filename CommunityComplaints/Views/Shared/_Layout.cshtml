@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CommunityComplaints</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CommunityComplaints.styles.css" asp-append-version="true" />
+</head>
+
+<body>
+    @using Microsoft.AspNetCore.Http
+@{
+        var userId = Context.Session.GetInt32("UserId");
+        var userName = Context.Session.GetString("UserName");
+        var roleId = Context.Session.GetInt32("RoleId");
+    }
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    CommunityComplaints
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <!-- LEFT SIDE MENU -->
+                    <ul class="navbar-nav me-auto">
+
+                        @* RESIDENT *@
+                        @if (userId != null && roleId == 2)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Complaints" asp-action="MyComplaints">
+                                    My Complaints
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Complaints" asp-action="Create">
+                                    Create Complaint
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Announcements" asp-action="Index">
+                                    Announcements
+                                </a>
+                            </li>
+                        }
+
+                        @if (userId != null && roleId == 1)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Complaints" asp-action="Index">
+                                    All Complaints
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Users" asp-action="Index">
+                                    Users
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Announcements" asp-action="Index">
+                                    Manage Announcements
+                                </a>
+                            </li>
+                        }
+
+                    <!-- RIGHT SIDE MENU -->
+                    <ul class="navbar-nav ms-auto">
+
+                        @if (userId == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    Login
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    Register
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    Hello, @userName
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container mt-3">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - CommunityComplaints
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model IEnumerable<CommunityComplaints.Models.Complaint>
+
+<h2>All Complaints (Staff)</h2>
+
+<form method="get">
+    Status: <input name="status" />
+    Urgency: <input name="urgency" />
+    <button type="submit">Filter</button>
+</form>
+
+<table>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Title</td>
+            <td>@item.Resident.FullName</td>
+            <td>@item.Status</td>
+            <td>@item.Urgency</td>
+            <td>
+              <a asp-action="Details" asp-route-id="@item.ComplaintId">View</a>
+            </td>
+            <td>
+              @if (Context.Session.GetInt32("RoleId") == 1)  
+              {
+              <a asp-action="Manage" asp-route-id="@item.ComplaintId" class="btn btn-sm btn-warning">
+            Manage
+              </a>
+               }
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,62 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<CommunityComplaints.Models.Complaint>
+
+<h2>My Complaints</h2>
+
+<a asp-action="Create">Create Complaint</a>
+
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Urgency</th>
+        <th>Actions</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Title</td>
+            <td>@item.Status</td>
+            <td>@item.Urgency</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ComplaintId">View</a>
+
+                @if (item.Status == "Open")
+                {
+                    <a asp-action="Cancel" asp-route-id="@item.ComplaintId">Cancel</a>
+                }
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.ComplaintId">View</a>
+
+                    @if (item.Status == "Open")
+                    {
+                        <a asp-action="Cancel" asp-route-id="@item.ComplaintId">Cancel</a>
+                    }
+
+                    @* ⭐ RATING FEATURE *@
+                    @if (item.Status == "Resolved")
+                    {
+                        var ratedList = ViewBag.RatedComplaints as List<int>;
+
+                        if (ratedList == null || !ratedList.Contains(item.ComplaintId))
+                        {
+                            <a href="/Ratings/Create?complaintId=@item.ComplaintId"
+                                   style="margin-left:10px; color:green;">
+                                ⭐ Rate
+                            </a>
+                        }
+                        else
+                        {
+                            <span style="margin-left:10px; color:green;">✔ Rated</span>
+                        }
+                    }
+                </td>
+            </td>
+        </tr>
+    }
+</table>

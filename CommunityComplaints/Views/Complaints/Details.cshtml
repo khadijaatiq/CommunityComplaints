@@ -1,0 +1,24 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CommunityComplaints.Models.Complaint
+
+<h2>@Model.Title</h2>
+
+<p>@Model.Description</p>
+<p>Status: @Model.Status</p>
+
+<h3>Timeline</h3>
+@foreach (var stage in Model.ResolutionStages)
+{
+    <p>@stage.Title - @stage.CreatedAt</p>
+}
+
+<h3>Comments</h3>
+@foreach (var comment in Model.Comments)
+{
+    <p>@comment.Message</p>
+}
