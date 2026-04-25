@@ -1,24 +1,65 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
 @model CommunityComplaints.Models.Complaint
-
-<h2>@Model.Title</h2>
-
-<p>@Model.Description</p>
-<p>Status: @Model.Status</p>
-
-<h3>Timeline</h3>
-@foreach (var stage in Model.ResolutionStages)
-{
-    <p>@stage.Title - @stage.CreatedAt</p>
+@using Microsoft.AspNetCore.Http
+@{ ViewData["Title"]="Complaint #"+Model.ComplaintId; }
+@functions {
+    string SBadge(string s) => s switch { "Open"=>"badge-open","InProgress"=>"badge-progress","Resolved"=>"badge-resolved","Cancelled"=>"badge-cancelled",_=>"badge-cancelled" };
+    string UBadge(string u) => u switch { "Critical"=>"badge-critical","High"=>"badge-high","Medium"=>"badge-medium","Low"=>"badge-low",_=>"badge-low" };
+    string SLabel(string s) => s == "InProgress" ? "In Progress" : s;
+    string Initials(string n) { var p=n.Split(' ',System.StringSplitOptions.RemoveEmptyEntries); return p.Length>=2?$"{p[0][0]}{p[^1][0]}".ToUpper():n[..Math.Min(2,n.Length)].ToUpper(); }
 }
-
-<h3>Comments</h3>
-@foreach (var comment in Model.Comments)
-{
-    <p>@comment.Message</p>
-}
+<div style="margin-bottom:1.25rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-controller="Complaints" asp-action="MyComplaints">← Back to my complaints</a></div>
+<div class="cc-card" style="margin-bottom:1rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+        <div>
+            <div style="font-size:20px;font-weight:600;margin-bottom:.5rem;">@Model.Title</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;"><span class="badge @SBadge(Model.Status)">@SLabel(Model.Status)</span><span class="badge @UBadge(Model.Urgency)">@Model.Urgency</span><span class="badge badge-cancelled">@Model.Category</span></div>
+        </div>
+        <div style="text-align:right;font-size:13px;color:var(--muted);">
+            <div>Complaint #@Model.ComplaintId</div>
+            <div>@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
+            @if (Model.Department != null) { <div>Dept: @Model.Department.Name</div> }
+        </div>
+    </div>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:14px;color:var(--text);line-height:1.7;">@Model.Description</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;">
+    <div class="cc-card">
+        <div class="cc-card-header">Resolution timeline</div>
+        @if (!Model.ResolutionStages.Any()) { <div style="font-size:14px;color:var(--muted);">No updates yet.</div> }
+        else {
+        <div style="position:relative;padding-left:1.25rem;border-left:2px solid var(--border);">
+            @foreach (var stage in Model.ResolutionStages.OrderBy(s => s.CreatedAt)) {
+            <div style="position:relative;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+                <div style="position:absolute;left:-1.5rem;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid white;"></div>
+                <div style="font-weight:500;font-size:14px;">@stage.Title</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">@stage.Staff.FullName · @stage.CreatedAt.ToString("dd MMM, HH:mm")</div>
+                @if (!string.IsNullOrEmpty(stage.Description)) { <div style="font-size:13px;margin-top:4px;">@stage.Description</div> }
+            </div>
+            }
+        </div>
+        }
+    </div>
+    <div class="cc-card">
+        <div class="cc-card-header">Comments</div>
+        @if (!Model.Comments.Any(c => !c.IsInternal)) { <div style="font-size:14px;color:var(--muted);margin-bottom:1rem;">No comments yet.</div> }
+        else {
+        <div style="margin-bottom:1rem;">
+            @foreach (var c in Model.Comments.Where(x => !x.IsInternal).OrderBy(x => x.CreatedAt)) {
+            <div style="display:flex;gap:10px;margin-bottom:.75rem;">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--open-bg);color:var(--open);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">@Initials(c.User.FullName)</div>
+                <div><div style="font-size:13px;font-weight:500;">@c.User.FullName <span style="font-weight:400;color:var(--muted);">· @c.CreatedAt.ToString("dd MMM, HH:mm")</span></div><div style="font-size:14px;margin-top:2px;">@c.Message</div></div>
+            </div>
+            }
+        </div>
+        }
+        @if (Model.Status != "Cancelled" && Model.Status != "Resolved") {
+        <div style="border-top:1px solid var(--border);padding-top:1rem;">
+            <form asp-action="AddComment" asp-controller="Complaints" method="post">
+                <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
+                <textarea name="message" class="form-textarea form-control" rows="3" placeholder="Add a comment..." required maxlength="1000"></textarea>
+                <button type="submit" class="cc-btn-primary" style="margin-top:.5rem;">Send</button>
+            </form>
+        </div>
+        }
+    </div>
+</div>

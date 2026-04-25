@@ -1,44 +1,11 @@
-﻿@model CommunityComplaints.Models.AnnouncementRead
-
-@{
-    ViewData["Title"] = "Edit";
-}
-
-<h1>Edit</h1>
-
-<h4>AnnouncementRead</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="AnnouncementId" class="control-label"></label>
-                <select asp-for="AnnouncementId" class="form-control" asp-items="ViewBag.AnnouncementId"></select>
-                <span asp-validation-for="AnnouncementId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReadAt" class="control-label"></label>
-                <input asp-for="ReadAt" class="form-control" />
-                <span asp-validation-for="ReadAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+@model CommunityComplaints.Models.AnnouncementRead
+@{ ViewData["Title"]="Edit Read Record"; ViewData["Narrow"]=true; }
+<div class="cc-card"><div style="font-size:20px;font-weight:600;margin-bottom:1.25rem;">Edit read record</div>
+<form asp-action="Edit" method="post"><div asp-validation-summary="ModelOnly" class="cc-alert cc-alert-error"></div>
+<input type="hidden" asp-for="Id"/>
+<div class="form-group"><label class="form-label">Announcement</label><select class="form-select" asp-for="AnnouncementId" asp-items="ViewBag.AnnouncementId"></select></div>
+<div class="form-group"><label class="form-label">User</label><select class="form-select" asp-for="UserId" asp-items="ViewBag.UserId"></select></div>
+<div class="form-group"><label class="form-label" asp-for="ReadAt">Read at</label><input class="form-control" asp-for="ReadAt" type="datetime-local"/></div>
+<div style="display:flex;gap:8px;"><button type="submit" class="cc-btn-primary">Save</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></div>
+</form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

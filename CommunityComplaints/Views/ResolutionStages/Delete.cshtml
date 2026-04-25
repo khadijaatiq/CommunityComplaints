@@ -1,51 +1,14 @@
-﻿@model CommunityComplaints.Models.ResolutionStage
-
-@{
-    ViewData["Title"] = "Delete";
-}
-
-<h1>Delete</h1>
-
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>ResolutionStage</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Complaint)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Complaint.ComplaintId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Staff)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Staff.UserId)
-        </dd>
-    </dl>
+@model CommunityComplaints.Models.ResolutionStage
+@{ ViewData["Title"]="Delete Stage"; ViewData["Narrow"]=true; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card">
+    <div style="font-size:20px;font-weight:600;color:var(--crit);margin-bottom:.5rem;">Delete stage?</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:1.25rem;">This action cannot be undone.</div>
+    <div class="cc-field"><div class="cc-field-label">Title</div><div class="cc-field-value">@Model.Title</div></div>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="StageId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <div class="cc-field"><div class="cc-field-label">Complaint</div><div class="cc-field-value">#@Model.Complaint.ComplaintId</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Staff</div><div class="cc-field-value">@Model.Staff.FullName</div></div>
+    
+    <form asp-action="Delete" method="post" style="display:flex;gap:8px;margin-top:1.25rem;"><input type="hidden" asp-for="StageId"/><input type="hidden" name="complaintId" value="@Model.ComplaintId"/><button type="submit" class="cc-btn-danger" style="padding:9px 20px;font-size:14px;font-weight:500;">Yes, delete</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></form>
 </div>

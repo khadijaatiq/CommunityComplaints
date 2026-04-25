@@ -1,111 +1,71 @@
-﻿@model IEnumerable<CommunityComplaints.Models.Announcement>
-
+@model IEnumerable<CommunityComplaints.Models.Announcement>
+@using Microsoft.AspNetCore.Http
 @{
-    ViewBag.Title = "Announcements";
-
-    var roleId = Context.Session.GetInt32("RoleId") ?? 0;
-    var readList = ViewBag.ReadIds as List<int> ?? new List<int>();
-    var readCounts = ViewBag.ReadCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    ViewData["Title"] = "Announcements"; var roleId = Context.Session.GetInt32("RoleId") ?? 0; var readList = ViewBag.ReadIds as List<int> ?? new List<int>(); var readCounts = ViewBag.ReadCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
-
-<h2>Announcements</h2>
-
-@if (roleId == 1)
+<div class="cc-page-header">
+    <div><div class="cc-page-title">Announcements</div><div class="cc-page-sub">@Model.Count() announcement(s)</div></div>
+    @if (roleId == 1)
+    {
+        <a class="cc-btn-primary" asp-action="Create">+ New announcement</a>
+    }
+</div>
+@if (!Model.Any())
 {
-    <a class="btn btn-primary mb-3" asp-action="Create">
-        + Create Announcement
-    </a>
+    <div class="cc-card" style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-size:28px;margin-bottom:.5rem;">📣</div><div style="font-weight:500;">No announcements yet</div></div>
 }
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Body</th>
-            <th>Expiry</th>
-            <th>Status</th>
-
-            @if (roleId == 2)
-            {
-                <th>Action</th>
-            }
-
-            @if (roleId == 1)
-            {
-                <th>Reads</th>
-                <th>Admin</th>
-            }
-        </tr>
-    </thead>
-
-    <tbody>
+else
+{
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
         @foreach (var item in Model)
         {
-            // FIXED STATUS LOGIC (IMPORTANT)
-            var isActive = item.IsActive &&
-                           (!item.ExpiresAt.HasValue || item.ExpiresAt > DateTime.Now);
-
-            <tr>
-                <td>@item.Title</td>
-                <td>@item.Body</td>
-
-                <td>
-                    @(item.ExpiresAt?.ToString("yyyy-MM-dd HH:mm") ?? "No expiry")
-                </td>
-
-                <td>
-                    @if (isActive)
-                    {
-                        <span class="text-success">Active</span>
-                    }
-                    else
-                    {
-                        <span class="text-danger">Inactive</span>
-                    }
-                </td>
-
-                @* ================= RESIDENT VIEW ================= *@
-                @if (roleId == 2)
-                {
-                    <td>
-                        @if (readList.Contains(item.AnnouncementId))
+            var isActive = item.IsActive && (!item.ExpiresAt.HasValue || item.ExpiresAt > DateTime.Now);
+            <div class="cc-card" style="@(!isActive ? "opacity:.6;" : "")">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem;">
+                    <div style="font-size:16px;font-weight:600;">@item.Title</div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        @if (isActive)
                         {
-                            <span class="text-success">✔ Read</span>
+                            <span class="badge badge-resolved">Active</span>
                         }
                         else
                         {
-                            <a asp-action="MarkRead"
-                                   asp-route-id="@item.AnnouncementId"
-                                   class="btn btn-sm btn-primary">
-                                Mark as Read
-                            </a>
+
+                            <span class="badge badge-cancelled">Inactive</span>
                         }
-                    </td>
-                }
+                        @if (item.ExpiresAt.HasValue)
+                        {
+                            <span style="font-size:12px;color:var(--muted);">Expires @item.ExpiresAt.Value.ToString("dd MMM yyyy")</span>
+                        }
+                    </div>
+                </div>
+                <div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:.75rem;">@item.Body</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <div style="font-size:12px;color:var(--muted);">Posted @item.CreatedAt.ToString("dd MMM yyyy")</div>
+                    <div style="display:flex;gap:8px;">
+                        @if (roleId == 2)
+                        {
+                            @if (readList.Contains(item.AnnouncementId))
+                            {
+                                <span style="font-size:13px;color:var(--res);">✓ Read</span>
+                            }
+                            else
+                            {
 
-                @* ================= STAFF VIEW ================= *@
-                @if (roleId == 1)
-                {
-                    <td>
-                        @(readCounts.ContainsKey(item.AnnouncementId)
-                            ? readCounts[item.AnnouncementId]
-                            : 0)
-                    </td>
-
-                    <td>
-                        <a asp-action="Edit"
-                               asp-route-id="@item.AnnouncementId">
-                            Edit
-                        </a>
-                        |
-                        <a asp-action="Deactivate"
-                               asp-route-id="@item.AnnouncementId"
-                               onclick="return confirm('Are you sure you want to deactivate this announcement?');">
-                            Deactivate
-                        </a>
-                    </td>
-                }
-            </tr>
+                                <a class="cc-btn-outline" asp-action="MarkRead" asp-route-id="@item.AnnouncementId">Mark as read</a>
+                            }
+                        }
+                        @if (roleId == 1)
+                        {
+                            <span style="font-size:13px;color:var(--muted);">@(readCounts.ContainsKey(item.AnnouncementId) ? readCounts[item.AnnouncementId] : 0) read(s)</span>
+                            <a class="cc-btn-outline" asp-action="Edit" asp-route-id="@item.AnnouncementId">Edit</a>
+                            <form asp-action="Deactivate" asp-route-id="@item.AnnouncementId" method="post" style="display:inline;" onsubmit="return confirm('Deactivate this announcement?')">
+                                <button type="submit" class="cc-btn-danger">Deactivate</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}

@@ -1,32 +1,25 @@
-﻿@model CommunityComplaints.Models.Rating
-
-<h2>Rate Complaint</h2>
-
-<form asp-action="Create" method="post">
-
-    <!-- ComplaintId hidden -->
-    <input type="hidden" name="ComplaintId" value="@ViewBag.ComplaintId" />
-
-    <!-- Stars -->
-    <label>Stars</label>
-    <select name="Stars" class="form-control">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
-
-    <br />
-
-    <!-- Feedback -->
-    <label>Feedback</label>
-    <textarea name="Feedback" class="form-control"></textarea>
-
-    <br />
-
-    <button type="submit" class="btn btn-primary">
-        Submit Rating
-    </button>
-
-</form>
+@model CommunityComplaints.Models.Rating
+@{ ViewData["Title"]="Rate Complaint"; ViewData["Narrow"]=true; }
+<div class="cc-card">
+    <div style="font-size:20px;font-weight:600;margin-bottom:.5rem;">Rate this complaint</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:1.5rem;">Your feedback helps us improve.</div>
+    <form asp-action="Create" method="post">
+        <input type="hidden" name="ComplaintId" value="@ViewBag.ComplaintId" />
+        <div class="form-group">
+            <label class="form-label">Rating</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                @for (int i = 1; i <= 5; i++) {
+                <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--rad-sm);cursor:pointer;font-size:14px;">
+                    <input type="radio" name="Stars" value="@i" @(i==5?"checked":"") required style="width:14px;height:14px;"/>
+                    @string.Concat(Enumerable.Repeat("⭐", i)) @i
+                </label>
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Feedback <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <textarea name="Feedback" class="form-textarea form-control" rows="4" placeholder="Share what went well..." maxlength="1000"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;"><button type="submit" class="cc-btn-primary">Submit rating</button><a class="cc-btn-outline" asp-controller="Complaints" asp-action="MyComplaints">Cancel</a></div>
+    </form>
+</div>

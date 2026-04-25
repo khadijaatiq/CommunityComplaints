@@ -1,33 +1,9 @@
-﻿@model CommunityComplaints.Models.Department
-
-@{
-    ViewData["Title"] = "Create";
-}
-
-<h1>Create</h1>
-
-<h4>Department</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+@model CommunityComplaints.Models.Department
+@{ ViewData["Title"]="New Department"; ViewData["Narrow"]=true; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card"><div style="font-size:20px;font-weight:600;margin-bottom:1.25rem;">New department</div>
+<form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="cc-alert cc-alert-error"></div>
+<div class="form-group"><label class="form-label" asp-for="Name">Name *</label><input class="form-control" asp-for="Name" placeholder="e.g. Maintenance"/><span class="field-error" asp-validation-for="Name"></span></div>
+<div style="display:flex;gap:8px;"><button type="submit" class="cc-btn-primary">Create</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></div>
+</form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,35 +1,28 @@
-﻿@model IEnumerable<CommunityComplaints.Models.Department>
-
-@{
-    ViewData["Title"] = "Index";
+@model IEnumerable<CommunityComplaints.Models.Department>
+@{ ViewData["Title"]="Departments"; }
+<div class="cc-page-header">
+    <div><div class="cc-page-title">Departments</div><div class="cc-page-sub">@Model.Count() record(s)</div></div>
+    <a class="cc-btn-primary" asp-action="Create">+ New</a>
+</div>
+@if (!Model.Any()) {
+<div class="cc-card" style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-weight:500;">No records yet</div></div>
+} else {
+<div class="cc-card" style="padding:0;overflow:hidden;">
+    <table class="cc-table">
+        <thead><tr><th>Name</th><th>Actions</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td style="font-weight:500;">@item.Name</td>
+                
+                <td style="white-space:nowrap;">
+                    <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.DepartmentId">Details</a>
+                    <a class="cc-btn-outline" style="margin-left:6px;" asp-action="Edit" asp-route-id="@item.DepartmentId">Edit</a>
+                    <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.DepartmentId">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.DepartmentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.DepartmentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.DepartmentId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>

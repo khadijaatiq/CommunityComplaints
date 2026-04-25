@@ -1,18 +1,46 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
 @model CommunityComplaints.Models.Complaint
-
-<h2>Create Complaint</h2>
-
-<form asp-action="Create" method="post">
-    <input asp-for="Title" placeholder="Title" />
-    <textarea asp-for="Description"></textarea>
-
-    <select asp-for="Category" asp-items="ViewBag.Categories"></select>
-    <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId"></select>
-
-    <button type="submit">Submit</button>
-</form>
+@{
+    ViewData["Title"] = "Submit Complaint"; ViewData["Narrow"] = true;
+}
+<div style="margin-bottom:1.5rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-controller="Complaints" asp-action="MyComplaints">← Back to my complaints</a></div>
+<div class="cc-card">
+    <div style="font-size:20px;font-weight:600;margin-bottom:.25rem;">Submit a complaint</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:1.5rem;">Describe your issue clearly so it can be assigned to the right department.</div>
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="cc-alert cc-alert-error"></div>
+        <div class="form-group">
+            <label class="form-label" asp-for="Title">Title <span style="color:var(--crit)">*</span></label>
+            <input class="form-control" asp-for="Title" placeholder="Short summary of the issue" maxlength="200" />
+            <span class="field-error" asp-validation-for="Title"></span>
+        </div>
+        <div class="form-group">
+            <label class="form-label" asp-for="Description">Description <span style="color:var(--crit)">*</span></label>
+            <textarea class="form-textarea form-control" asp-for="Description" placeholder="Describe the problem in detail (min 20 characters)" maxlength="1000" rows="5"></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="field-error" asp-validation-for="Description"></span><span style="font-size:12px;color:var(--muted);" id="charCount">0 / 1000</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="margin:0">
+                <label class="form-label" asp-for="Category">Category <span style="color:var(--crit)">*</span></label>
+                <select class="form-select" asp-for="Category" asp-items="new SelectList((List<string>)ViewBag.Categories)"><option value="">-- Select category --</option></select>
+                <span class="field-error" asp-validation-for="Category"></span>
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" asp-for="Urgency">Urgency <span style="color:var(--crit)">*</span></label>
+                <select class="form-select" asp-for="Urgency" asp-items="new SelectList((List<string>)ViewBag.Urgencies)"><option value="">-- Select urgency --</option></select>
+                <span class="field-error" asp-validation-for="Urgency"></span>
+            </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" asp-for="DepartmentId">Department <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <select class="form-select" asp-for="DepartmentId" asp-items="ViewBag.DepartmentId"><option value="">-- Auto-assign --</option></select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:1.5rem;">
+            <button type="submit" class="cc-btn-primary">Submit complaint</button>
+            <a class="cc-btn-outline" asp-controller="Complaints" asp-action="MyComplaints">Cancel</a>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>const ta=document.querySelector('textarea[name="Description"]');const cc=document.getElementById('charCount');if(ta&&cc){const u=()=>cc.textContent=ta.value.length+' / 1000';ta.addEventListener('input',u);u();}</script>
+}

@@ -1,77 +1,24 @@
-﻿@model IEnumerable<CommunityComplaints.Models.User>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PasswordHash)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+@model IEnumerable<CommunityComplaints.Models.User>
+@{ ViewData["Title"]="Users"; }
+<div class="cc-page-header"><div><div class="cc-page-title">Users</div><div class="cc-page-sub">@Model.Count() account(s)</div></div><a class="cc-btn-primary" asp-action="Create">+ New user</a></div>
+<div class="cc-card" style="padding:0;overflow:hidden;">
+<table class="cc-table">
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Unit</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PasswordHash)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role.RoleId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
+            <td style="font-weight:500;">@item.FullName</td>
+            <td style="color:var(--muted);font-size:13px;">@item.Email</td>
+            <td><span class="badge @(item.Role?.Name=="Staff"?"badge-open":"badge-cancelled")">@item.Role?.Name</span></td>
+            <td style="color:var(--muted);">@(string.IsNullOrEmpty(item.UnitNumber)?"—":item.UnitNumber)</td>
+            <td>@if(item.IsActive){<span class="badge badge-resolved">Active</span>}else{<span class="badge badge-cancelled">Inactive</span>}</td>
+            <td style="color:var(--muted);font-size:13px;white-space:nowrap;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+            <td style="white-space:nowrap;">
+                <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.UserId">Details</a>
+                <a class="cc-btn-outline" style="margin-left:6px;" asp-action="Edit" asp-route-id="@item.UserId">Edit</a>
+                <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
-</table>
+</table></div>

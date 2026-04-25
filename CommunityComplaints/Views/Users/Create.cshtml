@@ -1,53 +1,18 @@
-﻿@model CommunityComplaints.Models.User
-
-@{
-    ViewData["Title"] = "Create";
-}
-
-<h1>Create</h1>
-
-<h4>User</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="FullName"></label>
-                <input asp-for="FullName" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="Password" class="form-control" required />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="UnitNumber"></label>
-                <input asp-for="UnitNumber" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Phone"></label>
-                <input asp-for="Phone" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="RoleId"></label>
-                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
-            </div>
-
-            <br />
-            <input type="submit" value="Create" class="btn btn-primary" />
-        </form>
-    </div>
+@model CommunityComplaints.Models.User
+@{ ViewData["Title"]="New User"; ViewData["Narrow"]=true; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card"><div style="font-size:20px;font-weight:600;margin-bottom:1.25rem;">New user</div>
+<form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="cc-alert cc-alert-error"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="form-group" style="margin:0;"><label class="form-label" asp-for="FullName">Full name *</label><input class="form-control" asp-for="FullName"/></div>
+    <div class="form-group" style="margin:0;"><label class="form-label" asp-for="UnitNumber">Unit number</label><input class="form-control" asp-for="UnitNumber" placeholder="Optional"/></div>
 </div>
-
-<a asp-action="Index">Back to List</a>
+<div class="form-group" style="margin-top:12px;"><label class="form-label" asp-for="Email">Email *</label><input class="form-control" asp-for="Email" type="email"/></div>
+<div class="form-group"><label class="form-label">Password *</label><input class="form-control" type="password" name="Password" placeholder="Min 8 characters" required minlength="8"/><span style="font-size:12px;color:var(--muted);">Requires uppercase, lowercase, digit, and special character.</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="form-group" style="margin:0;"><label class="form-label" asp-for="Phone">Phone</label><input class="form-control" asp-for="Phone" placeholder="Optional"/></div>
+    <div class="form-group" style="margin:0;"><label class="form-label" asp-for="RoleId">Role *</label><select class="form-select" asp-for="RoleId" asp-items="ViewBag.RoleId"><option value="">-- Select --</option></select></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:1rem;"><button type="submit" class="cc-btn-primary">Create user</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></div>
+</form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

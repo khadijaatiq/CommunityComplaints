@@ -1,30 +1,29 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
 @model CommunityComplaints.ViewModels.LoginViewModel
-
-<h2>Login</h2>
-
-<form asp-action="Login" method="post">
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+@{ ViewData["Title"] = "Sign in"; ViewData["Narrow"] = true; }
+<div class="cc-card">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-size:22px;font-weight:600;margin-bottom:4px;">Welcome back</div>
+        <div style="font-size:14px;color:var(--muted);">Sign in to your account</div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="float-end">
-        <a asp-controller="Account" asp-action="VerifyEmail" class="text-decoration-none">
-            Forgot password?
-        </a>
-    </div>
-    <button type="submit">Login</button>
-    <p class="text-center mt-2">
-        Don't have an account? <a asp-controller="Account" asp-action="Register" class="text-decoration-none">Register</a>
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="All" class="cc-alert cc-alert-error"></div>
+        <div class="form-group">
+            <label class="form-label" asp-for="Email">Email address</label>
+            <input class="form-control" asp-for="Email" placeholder="you@example.com" autocomplete="email" />
+            <span class="field-error" asp-validation-for="Email"></span>
+        </div>
+        <div class="form-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                <label class="form-label" style="margin:0" asp-for="Password">Password</label>
+                <a style="font-size:13px;color:var(--accent);text-decoration:none;" asp-controller="Account" asp-action="VerifyEmail">Forgot password?</a>
+            </div>
+            <input class="form-control" asp-for="Password" placeholder="••••••••" autocomplete="current-password" />
+            <span class="field-error" asp-validation-for="Password"></span>
+        </div>
+        <button type="submit" class="cc-btn-primary cc-btn-primary-wide" style="margin-top:.5rem;">Sign in</button>
+    </form>
+    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:1.25rem;">
+        No account? <a style="color:var(--accent);text-decoration:none;" asp-controller="Account" asp-action="Register">Register here</a>
     </p>
-</form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

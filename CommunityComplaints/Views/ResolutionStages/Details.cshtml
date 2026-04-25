@@ -1,48 +1,16 @@
-﻿@model CommunityComplaints.Models.ResolutionStage
-
-@{
-    ViewData["Title"] = "Details";
-}
-
-<h1>Details</h1>
-
-<div>
-    <h4>ResolutionStage</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Complaint)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Complaint.ComplaintId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Staff)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Staff.UserId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.StageId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+@model CommunityComplaints.Models.ResolutionStage
+@{ ViewData["Title"]="Stage Details"; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card" style="max-width:560px;"><div class="cc-card-header">Resolution stage</div>
+    <div class="cc-field"><div class="cc-field-label">Title</div><div class="cc-field-value">@Model.Title</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Description</div><div class="cc-field-value">@(string.IsNullOrEmpty(Model.Description) ? "—" : Model.Description)</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Complaint</div><div class="cc-field-value">#@Model.Complaint.ComplaintId</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Staff</div><div class="cc-field-value">@Model.Staff.FullName</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Created</div><div class="cc-field-value">@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div></div>
+    
+    <div style="margin-top:1.25rem;display:flex;gap:8px;"><a class="cc-btn-primary" asp-action="Edit" asp-route-id="@Model.StageId">Edit</a><a class="cc-btn-outline" asp-action="Index">Back</a></div>
 </div>

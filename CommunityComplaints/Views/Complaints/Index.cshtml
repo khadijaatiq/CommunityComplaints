@@ -1,38 +1,47 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
 @model IEnumerable<CommunityComplaints.Models.Complaint>
-
-<h2>All Complaints (Staff)</h2>
-
-<form method="get">
-    Status: <input name="status" />
-    Urgency: <input name="urgency" />
-    <button type="submit">Filter</button>
-</form>
-
-<table>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Title</td>
-            <td>@item.Resident.FullName</td>
-            <td>@item.Status</td>
-            <td>@item.Urgency</td>
-            <td>
-              <a asp-action="Details" asp-route-id="@item.ComplaintId">View</a>
-            </td>
-            <td>
-              @if (Context.Session.GetInt32("RoleId") == 1)  
-              {
-              <a asp-action="Manage" asp-route-id="@item.ComplaintId" class="btn btn-sm btn-warning">
-            Manage
-              </a>
-               }
-            </td>
-        </tr>
-    }
-</table>
+@{ ViewData["Title"]="All Complaints"; }
+@functions {
+    string SBadge(string s) => s switch { "Open"=>"badge-open","InProgress"=>"badge-progress","Resolved"=>"badge-resolved","Cancelled"=>"badge-cancelled",_=>"badge-cancelled" };
+    string UBadge(string u) => u switch { "Critical"=>"badge-critical","High"=>"badge-high","Medium"=>"badge-medium","Low"=>"badge-low",_=>"badge-low" };
+    string SLabel(string s) => s == "InProgress" ? "In Progress" : s;
+    string Initials(string n) { var p=n.Split(' ',System.StringSplitOptions.RemoveEmptyEntries); return p.Length>=2?$"{p[0][0]}{p[^1][0]}".ToUpper():n[..Math.Min(2,n.Length)].ToUpper(); }
+}
+<div class="cc-page-header">
+    <div><div class="cc-page-title">All Complaints</div><div class="cc-page-sub">@Model.Count() total</div></div>
+</div>
+<div class="cc-card" style="margin-bottom:1rem;padding:1rem 1.25rem;">
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+        <div><label class="form-label">Status</label><select name="status" class="form-select" style="width:140px;"><option value="">All</option>@foreach(var s in (List<string>)ViewBag.ValidStatuses){<option value="@s" selected="@(ViewBag.SelectedStatus==s)">@SLabel(s)</option>}</select></div>
+        <div><label class="form-label">Urgency</label><select name="urgency" class="form-select" style="width:130px;"><option value="">All</option>@foreach(var u in (List<string>)ViewBag.ValidUrgencies){<option value="@u" selected="@(ViewBag.SelectedUrgency==u)">@u</option>}</select></div>
+        <div><label class="form-label">Category</label><select name="category" class="form-select" style="width:160px;"><option value="">All</option>@foreach(var c in (List<string>)ViewBag.ValidCategories){<option value="@c" selected="@(ViewBag.SelectedCategory==c)">@c</option>}</select></div>
+        <div><label class="form-label">Department</label><select name="departmentId" class="form-select" style="width:160px;" asp-items="ViewBag.Departments"><option value="">All</option></select></div>
+        <button type="submit" class="cc-btn-primary" style="height:38px;">Filter</button>
+        <a href="@Url.Action("Index")" class="cc-btn-outline" style="height:38px;line-height:22px;">Clear</a>
+    </form>
+</div>
+@if (!Model.Any()) {
+<div class="cc-card" style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-size:32px;margin-bottom:.5rem;">🔍</div><div style="font-weight:500;">No complaints match your filters</div></div>
+} else {
+<div class="cc-card" style="padding:0;overflow:hidden;">
+    <table class="cc-table">
+        <thead><tr><th>#</th><th>Title</th><th>Resident</th><th>Category</th><th>Status</th><th>Urgency</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td style="color:var(--muted);font-family:var(--mono);font-size:13px;">#@item.ComplaintId</td>
+                <td style="font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@item.Title</td>
+                <td style="color:var(--muted);">@item.Resident.FullName</td>
+                <td style="color:var(--muted);">@item.Category</td>
+                <td><span class="badge @SBadge(item.Status)">@SLabel(item.Status)</span></td>
+                <td><span class="badge @UBadge(item.Urgency)">@item.Urgency</span></td>
+                <td style="color:var(--muted);white-space:nowrap;font-size:13px;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                <td style="white-space:nowrap;">
+                    <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.ComplaintId">View</a>
+                    <a class="cc-btn-primary" style="margin-left:6px;padding:6px 12px;font-size:13px;" asp-action="Manage" asp-route-id="@item.ComplaintId">Manage</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}

@@ -1,142 +1,145 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - CommunityComplaints</title>
-
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/CommunityComplaints.styles.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#F4F2EE;--surface:#FFFFFF;--border:#E0DDD7;--text:#1A1916;--muted:#6B6860;
+            --accent:#1B4FD8;--accent-h:#1540B8;
+            --open:#1B4FD8;--open-bg:#EEF2FF;
+            --prog:#92400E;--prog-bg:#FEF3C7;
+            --res:#065F46;--res-bg:#D1FAE5;
+            --can:#374151;--can-bg:#F3F4F6;
+            --crit:#991B1B;--crit-bg:#FEE2E2;
+            --high:#92400E;--high-bg:#FEF3C7;
+            --med:#1B4FD8;--med-bg:#EEF2FF;
+            --low:#065F46;--low-bg:#D1FAE5;
+            --font:"DM Sans",system-ui,sans-serif;--mono:"DM Mono",monospace;
+            --rad:10px;--rad-sm:6px;
+        }
+        body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+        /* NAV */
+        .cc-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+        .cc-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--text);text-decoration:none;}
+        .cc-brand-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+        .cc-brand-icon svg{width:18px;height:18px;fill:#fff;}
+        .cc-nav-links{display:flex;align-items:center;gap:4px;}
+        .cc-nav-links a{padding:6px 12px;border-radius:var(--rad-sm);font-size:14px;color:var(--muted);text-decoration:none;transition:background .15s,color .15s;}
+        .cc-nav-links a:hover{background:var(--bg);color:var(--text);}
+        .cc-nav-right{display:flex;align-items:center;gap:12px;}
+        .cc-user-chip{font-size:13px;color:var(--muted);background:var(--bg);padding:5px 12px;border-radius:20px;border:1px solid var(--border);}
+        /* ALERTS */
+        .cc-alert{padding:10px 16px;border-radius:var(--rad-sm);font-size:14px;margin-bottom:1rem;}
+        .cc-alert-success{background:#D1FAE5;color:#065F46;}
+        .cc-alert-error{background:#FEE2E2;color:#991B1B;}
+        /* LAYOUT */
+        .cc-main{flex:1;}
+        .cc-container{max-width:1060px;margin:0 auto;padding:2rem 1.5rem;}
+        .cc-container-narrow{max-width:480px;margin:0 auto;padding:3rem 1.5rem;}
+        /* CARD */
+        .cc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem;}
+        .cc-card+.cc-card{margin-top:1rem;}
+        .cc-card-header{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+        /* BADGES */
+        .badge{display:inline-block;font-size:12px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+        .badge-open{color:var(--open);background:var(--open-bg);}
+        .badge-progress{color:var(--prog);background:var(--prog-bg);}
+        .badge-resolved{color:var(--res);background:var(--res-bg);}
+        .badge-cancelled{color:var(--can);background:var(--can-bg);}
+        .badge-critical{color:var(--crit);background:var(--crit-bg);}
+        .badge-high{color:var(--high);background:var(--high-bg);}
+        .badge-medium{color:var(--med);background:var(--med-bg);}
+        .badge-low{color:var(--low);background:var(--low-bg);}
+        /* FORMS */
+        .form-group{margin-bottom:1rem;}
+        .form-label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:5px;}
+        .form-control,.form-select,.form-textarea{width:100%;padding:9px 12px;font-size:14px;font-family:var(--font);color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-sm);transition:border .15s;outline:none;}
+        .form-control:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(27,79,216,.1);}
+        .form-textarea{resize:vertical;min-height:90px;}
+        .field-error{font-size:12px;color:var(--crit);margin-top:4px;}
+        /* BUTTONS */
+        .cc-btn-primary{display:inline-block;padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--rad-sm);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;text-decoration:none;transition:background .15s;}
+        .cc-btn-primary:hover{background:var(--accent-h);}
+        .cc-btn-primary-wide{width:100%;text-align:center;}
+        .cc-btn-outline{display:inline-block;padding:7px 16px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:var(--rad-sm);font-size:13px;font-family:var(--font);cursor:pointer;text-decoration:none;transition:all .15s;}
+        .cc-btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+        .cc-btn-sm{padding:6px 14px;border-radius:var(--rad-sm);font-size:13px;font-family:var(--font);font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s;background:transparent;border:1px solid var(--border);color:var(--muted);}
+        .cc-btn-sm:hover{border-color:#aaa;color:var(--text);}
+        .cc-btn-danger{display:inline-block;padding:7px 16px;background:#FEE2E2;color:var(--crit);border:1px solid #FECACA;border-radius:var(--rad-sm);font-size:13px;font-family:var(--font);cursor:pointer;text-decoration:none;transition:all .15s;}
+        .cc-btn-danger:hover{background:#FECACA;}
+        /* TABLE */
+        .cc-table{width:100%;border-collapse:collapse;font-size:14px;}
+        .cc-table th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;border-bottom:1px solid var(--border);}
+        .cc-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+        .cc-table tr:last-child td{border-bottom:none;}
+        .cc-table tr:hover td{background:var(--bg);}
+        /* PAGE HEADER */
+        .cc-page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+        .cc-page-title{font-size:22px;font-weight:600;}
+        .cc-page-sub{font-size:14px;color:var(--muted);margin-top:2px;}
+        /* FIELD (Details/Delete) */
+        .cc-field{display:grid;grid-template-columns:140px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);align-items:start;}
+        .cc-field:last-of-type{border-bottom:none;}
+        .cc-field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding-top:2px;}
+        .cc-field-value{font-size:14px;color:var(--text);}
+        /* FOOTER */
+        footer{padding:1rem 2rem;border-top:1px solid var(--border);font-size:13px;color:var(--muted);background:var(--surface);}
+    </style>
 </head>
-
 <body>
     @using Microsoft.AspNetCore.Http
-@{
-        var userId = Context.Session.GetInt32("UserId");
+    @{
+        var userId   = Context.Session.GetInt32("UserId");
         var userName = Context.Session.GetString("UserName");
-        var roleId = Context.Session.GetInt32("RoleId");
+        var roleId   = Context.Session.GetInt32("RoleId");
     }
-
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    CommunityComplaints
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-
-                    <!-- LEFT SIDE MENU -->
-                    <ul class="navbar-nav me-auto">
-
-                        @* RESIDENT *@
-                        @if (userId != null && roleId == 2)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Complaints" asp-action="MyComplaints">
-                                    My Complaints
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Complaints" asp-action="Create">
-                                    Create Complaint
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Announcements" asp-action="Index">
-                                    Announcements
-                                </a>
-                            </li>
-                        }
-
-                        @if (userId != null && roleId == 1)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Complaints" asp-action="Index">
-                                    All Complaints
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Users" asp-action="Index">
-                                    Users
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Announcements" asp-action="Index">
-                                    Manage Announcements
-                                </a>
-                            </li>
-                        }
-
-                    <!-- RIGHT SIDE MENU -->
-                    <ul class="navbar-nav ms-auto">
-
-                        @if (userId == null)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    Login
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">
-                                    Register
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link">
-                                    Hello, @userName
-                                </span>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Logout">
-                                    Logout
-                                </a>
-                            </li>
-                        }
-
-                    </ul>
-
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <div class="container mt-3">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - CommunityComplaints
+    <nav class="cc-nav">
+        <a class="cc-brand" asp-controller="Home" asp-action="Index">
+            <div class="cc-brand-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+            CommunityComplaints
+        </a>
+        <div class="cc-nav-links">
+            @if (userId != null && roleId == 2)
+            {
+                <a asp-controller="Complaints" asp-action="MyComplaints">My Complaints</a>
+                <a asp-controller="Complaints" asp-action="Create">Submit</a>
+                <a asp-controller="Announcements" asp-action="Index">Announcements</a>
+            }
+            @if (userId != null && roleId == 1)
+            {
+                <a asp-controller="Complaints" asp-action="Index">All Complaints</a>
+                <a asp-controller="Users" asp-action="Index">Users</a>
+                <a asp-controller="Announcements" asp-action="Index">Announcements</a>
+            }
         </div>
-    </footer>
-
+        <div class="cc-nav-right">
+            @if (userId == null)
+            {
+                <a class="cc-btn-sm" asp-controller="Account" asp-action="Login">Sign in</a>
+                <a class="cc-btn-primary" style="padding:6px 14px;font-size:13px;" asp-controller="Account" asp-action="Register">Register</a>
+            }
+            else
+            {
+                <span class="cc-user-chip">@userName</span>
+                <a class="cc-btn-sm" asp-controller="Account" asp-action="Logout">Sign out</a>
+            }
+        </div>
+    </nav>
+    <main class="cc-main">
+        <div class="@(ViewData["Narrow"] != null ? "cc-container-narrow" : "cc-container")">
+            @if (TempData["Success"] != null) { <div class="cc-alert cc-alert-success">✓ @TempData["Success"]</div> }
+            @if (TempData["Error"]   != null) { <div class="cc-alert cc-alert-error">⚠ @TempData["Error"]</div> }
+            @RenderBody()
+        </div>
+    </main>
+    <footer>&copy; 2026 CommunityComplaints</footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

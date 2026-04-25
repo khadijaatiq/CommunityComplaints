@@ -39,6 +39,19 @@ namespace CommunityComplaints.Controllers
             ModelState.Remove(nameof(user.CreatedAt));
             ModelState.Remove(nameof(user.Role));  // navigation property causes issues
 
+            // FIX 5: Validate password before hashing — previously an empty/null
+            // password was silently hashed and stored.
+            if (string.IsNullOrWhiteSpace(Password))
+                ModelState.AddModelError("Password", "Password is required");
+            else if (Password.Length < 8)
+                ModelState.AddModelError("Password", "Password must be at least 8 characters");
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "Name", user.RoleId);
+                return View(user);
+            }
+
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
             user.CreatedAt = DateTime.Now;
             user.IsActive = true;
@@ -88,8 +101,17 @@ namespace CommunityComplaints.Controllers
                     // Preserve fields not on the form
                     user.CreatedAt = existingUser.CreatedAt;
 
-                    if (!string.IsNullOrEmpty(NewPassword))
+                    // FIX 5b: Validate new password length/complexity before hashing
+                    if (!string.IsNullOrWhiteSpace(NewPassword))
+                    {
+                        if (NewPassword.Length < 8)
+                        {
+                            ModelState.AddModelError("NewPassword", "Password must be at least 8 characters");
+                            ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "Name", user.RoleId);
+                            return View(user);
+                        }
                         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NewPassword);
+                    }
                     else
                         user.PasswordHash = existingUser.PasswordHash;
 

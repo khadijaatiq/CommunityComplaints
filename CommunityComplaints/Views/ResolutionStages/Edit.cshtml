@@ -1,54 +1,13 @@
-﻿@model CommunityComplaints.Models.ResolutionStage
-
-@{
-    ViewData["Title"] = "Edit";
-}
-
-<h1>Edit</h1>
-
-<h4>ResolutionStage</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="StageId" />
-            <div class="form-group">
-                <label asp-for="ComplaintId" class="control-label"></label>
-                <select asp-for="ComplaintId" class="form-control" asp-items="ViewBag.ComplaintId"></select>
-                <span asp-validation-for="ComplaintId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StaffId" class="control-label"></label>
-                <select asp-for="StaffId" class="form-control" asp-items="ViewBag.StaffId"></select>
-                <span asp-validation-for="StaffId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+@model CommunityComplaints.Models.ResolutionStage
+@{ ViewData["Title"]="Edit Stage"; ViewData["Narrow"]=true; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card"><div style="font-size:20px;font-weight:600;margin-bottom:1.25rem;">Edit resolution stage</div>
+<form asp-action="Edit" method="post"><div asp-validation-summary="ModelOnly" class="cc-alert cc-alert-error"></div>
+<input type="hidden" asp-for="StageId"/>
+<div class="form-group"><label class="form-label">Complaint</label><select class="form-select" asp-for="ComplaintId" asp-items="ViewBag.ComplaintId"></select></div>
+<div class="form-group"><label class="form-label">Staff member</label><select class="form-select" asp-for="StaffId" asp-items="ViewBag.StaffId"></select></div>
+<div class="form-group"><label class="form-label" asp-for="Title">Title *</label><input class="form-control" asp-for="Title" maxlength="200"/><span class="field-error" asp-validation-for="Title"></span></div>
+<div class="form-group"><label class="form-label" asp-for="Description">Description</label><textarea class="form-textarea form-control" asp-for="Description" rows="3" maxlength="500"></textarea></div>
+<div style="display:flex;gap:8px;"><button type="submit" class="cc-btn-primary">Save</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></div>
+</form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

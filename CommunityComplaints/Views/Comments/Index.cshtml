@@ -1,59 +1,22 @@
-﻿@model IEnumerable<CommunityComplaints.Models.Comment>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Message)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsInternal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Complaint)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+@model IEnumerable<CommunityComplaints.Models.Comment>
+@{ ViewData["Title"]="Comments"; }
+<div class="cc-page-header"><div><div class="cc-page-title">Comments</div><div class="cc-page-sub">@Model.Count() comment(s)</div></div></div>
+<div class="cc-card" style="padding:0;overflow:hidden;">
+<table class="cc-table">
+    <thead><tr><th>Message</th><th>Complaint</th><th>User</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Message)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsInternal)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Complaint.ComplaintId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.UserId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CommentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CommentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CommentId">Delete</a>
+            <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@item.Message</td>
+            <td style="font-family:var(--mono);font-size:13px;color:var(--muted);">#@item.Complaint.ComplaintId</td>
+            <td style="color:var(--muted);">@item.User.FullName</td>
+            <td>@if(item.IsInternal){<span class="badge badge-high">Internal</span>}else{<span class="badge badge-cancelled">Public</span>}</td>
+            <td style="color:var(--muted);font-size:13px;white-space:nowrap;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+            <td style="white-space:nowrap;">
+                <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.CommentId">Details</a>
+                <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.CommentId">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
-</table>
+</table></div>

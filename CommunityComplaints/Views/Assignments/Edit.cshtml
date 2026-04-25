@@ -1,54 +1,12 @@
-﻿@model CommunityComplaints.Models.Assignment
-
-@{
-    ViewData["Title"] = "Edit";
-}
-
-<h1>Edit</h1>
-
-<h4>Assignment</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AssignmentId" />
-            <div class="form-group">
-                <label asp-for="ComplaintId" class="control-label"></label>
-                <select asp-for="ComplaintId" class="form-control" asp-items="ViewBag.ComplaintId"></select>
-                <span asp-validation-for="ComplaintId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StaffId" class="control-label"></label>
-                <select asp-for="StaffId" class="form-control" asp-items="ViewBag.StaffId"></select>
-                <span asp-validation-for="StaffId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AssignedBy" class="control-label"></label>
-                <select asp-for="AssignedBy" class="form-control" asp-items="ViewBag.AssignedBy"></select>
-                <span asp-validation-for="AssignedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="AssignedAt" class="control-label"></label>
-                <input asp-for="AssignedAt" class="form-control" />
-                <span asp-validation-for="AssignedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+@model CommunityComplaints.Models.Assignment
+@{ ViewData["Title"]="Edit Assignment"; ViewData["Narrow"]=true; }
+<div class="cc-card"><div style="font-size:20px;font-weight:600;margin-bottom:1.25rem;">Edit assignment</div>
+<form asp-action="Edit" method="post"><div asp-validation-summary="ModelOnly" class="cc-alert cc-alert-error"></div>
+<input type="hidden" asp-for="AssignmentId"/>
+<div class="form-group"><label class="form-label">Complaint</label><select class="form-select" asp-for="ComplaintId" asp-items="ViewBag.ComplaintId"></select></div>
+<div class="form-group"><label class="form-label">Staff</label><select class="form-select" asp-for="StaffId" asp-items="ViewBag.StaffId"></select></div>
+<div class="form-group"><label class="form-label">Assigned by</label><select class="form-select" asp-for="AssignedBy" asp-items="ViewBag.AssignedBy"></select></div>
+<div style="margin-top:4px;display:flex;align-items:center;gap:8px;"><input type="checkbox" asp-for="IsActive" style="width:16px;height:16px;"/><label class="form-label" style="margin:0;" asp-for="IsActive">Active</label></div>
+<div style="display:flex;gap:8px;margin-top:1rem;"><button type="submit" class="cc-btn-primary">Save</button><a class="cc-btn-outline" asp-action="Index">Cancel</a></div>
+</form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

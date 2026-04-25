@@ -1,59 +1,25 @@
-﻿@model IEnumerable<CommunityComplaints.Models.Rating>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Stars)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Feedback)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Complaint)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Resident)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+@model IEnumerable<CommunityComplaints.Models.Rating>
+@{ ViewData["Title"]="Ratings"; }
+<div class="cc-page-header"><div><div class="cc-page-title">Ratings</div><div class="cc-page-sub">@Model.Count() rating(s)</div></div></div>
+@if (!Model.Any()) {
+<div class="cc-card" style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-size:28px;margin-bottom:.5rem;">⭐</div><div style="font-weight:500;">No ratings yet</div></div>
+} else {
+<div class="cc-card" style="padding:0;overflow:hidden;">
+<table class="cc-table">
+    <thead><tr><th>Complaint #</th><th>Resident</th><th>Stars</th><th>Feedback</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stars)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Feedback)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Complaint.ComplaintId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Resident.UserId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RatingId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RatingId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RatingId">Delete</a>
+            <td style="font-family:var(--mono);font-size:13px;color:var(--muted);">#@item.Complaint.ComplaintId</td>
+            <td>@item.Resident.FullName</td>
+            <td>@string.Concat(Enumerable.Repeat("⭐", item.Stars))</td>
+            <td style="color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@item.Feedback</td>
+            <td style="color:var(--muted);font-size:13px;white-space:nowrap;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+            <td style="white-space:nowrap;">
+                <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.RatingId">Details</a>
+                <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.RatingId">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
-</table>
+</table></div>}

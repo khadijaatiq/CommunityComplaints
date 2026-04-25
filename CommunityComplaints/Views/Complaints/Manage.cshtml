@@ -1,246 +1,69 @@
-﻿@model CommunityComplaints.Models.Complaint
-@{
-    ViewData["Title"] = "Manage Complaint #" + Model.ComplaintId;
+@model CommunityComplaints.Models.Complaint
+@using Microsoft.AspNetCore.Http
+@{ ViewData["Title"]="Manage #"+Model.ComplaintId; }
+@functions {
+    string SBadge(string s) => s switch { "Open"=>"badge-open","InProgress"=>"badge-progress","Resolved"=>"badge-resolved","Cancelled"=>"badge-cancelled",_=>"badge-cancelled" };
+    string UBadge(string u) => u switch { "Critical"=>"badge-critical","High"=>"badge-high","Medium"=>"badge-medium","Low"=>"badge-low",_=>"badge-low" };
+    string SLabel(string s) => s == "InProgress" ? "In Progress" : s;
+    string Initials(string n) { var p=n.Split(' ',System.StringSplitOptions.RemoveEmptyEntries); return p.Length>=2?$"{p[0][0]}{p[^1][0]}".ToUpper():n[..Math.Min(2,n.Length)].ToUpper(); }
 }
-
-<h2>Manage Complaint #@Model.ComplaintId</h2>
-<a asp-action="Index" class="btn btn-secondary mb-3">← Back to All Complaints</a>
-
-<div class="row">
-    <!-- LEFT: Complaint Info -->
-    <div class="col-md-7">
-        <div class="card mb-3">
-            <div class="card-header"><strong>@Model.Title</strong></div>
-            <div class="card-body">
-                <p><strong>Resident:</strong> @Model.Resident.FullName (@Model.Resident.UnitNumber)</p>
-                <p><strong>Description:</strong> @Model.Description</p>
-                <p><strong>Category:</strong> @Model.Category</p>
-                <p><strong>Department:</strong> @(Model.Department?.Name ?? "Not assigned")</p>
-                <p><strong>Created:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</p>
-                <p><strong>Last Updated:</strong> @Model.UpdatedAt.ToString("dd MMM yyyy HH:mm")</p>
-                @if (Model.ResolvedAt.HasValue)
-                {
-                    <p><strong>Resolved:</strong> @Model.ResolvedAt.Value.ToString("dd MMM yyyy HH:mm")</p>
-                }
-
-                <!-- Status Badge -->
-                <p>
-                    <strong>Status:</strong>
-                    <span class="badge bg-@(Model.Status == "Open" ? "primary" : Model.Status == "InProgress" ? "warning" : Model.Status == "Resolved" ? "success" : "secondary")">
-                        @Model.Status
-                    </span>
-                    &nbsp;
-                    <strong>Urgency:</strong>
-                    <span class="badge bg-@(Model.Urgency == "Critical" ? "danger" : Model.Urgency == "High" ? "warning" : Model.Urgency == "Medium" ? "info" : "secondary")">
-                        @Model.Urgency
-                    </span>
-                </p>
-            </div>
+<div style="margin-bottom:1.25rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-controller="Complaints" asp-action="Index">← All complaints</a></div>
+<div class="cc-card" style="margin-bottom:1rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+        <div>
+            <div style="font-size:20px;font-weight:600;margin-bottom:.5rem;">@Model.Title</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.5rem;"><span class="badge @SBadge(Model.Status)">@SLabel(Model.Status)</span><span class="badge @UBadge(Model.Urgency)">@Model.Urgency</span><span class="badge badge-cancelled">@Model.Category</span></div>
+            <div style="font-size:13px;color:var(--muted);"><strong>@Model.Resident.FullName</strong>@if(!string.IsNullOrEmpty(Model.Resident.UnitNumber)){<span> · Unit @Model.Resident.UnitNumber</span>} · Submitted @Model.CreatedAt.ToString("dd MMM yyyy")</div>
         </div>
-
-        <!-- Update Status -->
-        <div class="card mb-3">
-            <div class="card-header">Update Status</div>
-            <div class="card-body">
-                <form asp-action="UpdateStatus" asp-controller="Complaints" method="post" class="d-flex gap-2">
-                    <input type="hidden" name="id" value="@Model.ComplaintId" />
-                    <select name="status" class="form-select">
-                        @foreach (var s in new[] { "Open", "InProgress", "Resolved", "Closed", "Cancelled" })
-                        {
-                            <option value="@s" selected="@(Model.Status == s)">@s</option>
-                        }
-                    </select>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Update Urgency -->
-        <div class="card mb-3">
-            <div class="card-header">Update Urgency</div>
-            <div class="card-body">
-                <form asp-action="UpdateUrgency" asp-controller="Complaints" method="post" class="d-flex gap-2">
-                    <input type="hidden" name="id" value="@Model.ComplaintId" />
-                    <select name="urgency" class="form-select">
-                        @foreach (var u in new[] { "Low", "Medium", "High", "Critical" })
-                        {
-                            <option value="@u" selected="@(Model.Urgency == u)">@u</option>
-                        }
-                    </select>
-                    <button type="submit" class="btn btn-warning">Update</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Update Department -->
-        <div class="card mb-3">
-            <div class="card-header">Assign Department</div>
-            <div class="card-body">
-                <form asp-action="UpdateDepartment" asp-controller="Complaints" method="post" class="d-flex gap-2">
-                    <input type="hidden" name="id" value="@Model.ComplaintId" />
-                    <select name="departmentId" class="form-select" asp-items="ViewBag.Departments">
-                        <option value="">-- None --</option>
-                    </select>
-                    <button type="submit" class="btn btn-info">Update</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Assign Staff -->
-        <div class="card mb-3">
-            <div class="card-header">Assign Staff Member</div>
-            <div class="card-body">
-                @{
-                    var activeAssignment = Model.Assignments.FirstOrDefault(a => a.IsActive);
-                }
-                @if (activeAssignment != null)
-                {
-                    <p class="mb-2">Currently assigned to: <strong>@activeAssignment.Staff.FullName</strong></p>
-                }
-                <form asp-action="Assign" asp-controller="Complaints" method="post" class="d-flex gap-2">
-                    <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
-                    <select name="staffId" class="form-select" asp-items="ViewBag.StaffList">
-                        <option value="">-- Select Staff --</option>
-                    </select>
-                    <button type="submit" class="btn btn-success">Assign</button>
-                </form>
-
-                @if (Model.Assignments.Any())
-                {
-                    <p class="mt-3 mb-1"><small><strong>Assignment History:</strong></small></p>
-                    <ul class="list-unstyled">
-                        @foreach (var a in Model.Assignments.OrderByDescending(a => a.AssignedAt))
-                        {
-                            <li>
-                                <small>
-                                    @a.Staff.FullName — @a.AssignedAt.ToString("dd MMM yyyy HH:mm")
-                                    @if (!a.IsActive)
-                                    {
-                                        <span class="text-muted">(previous)</span>
-                                    }
-                                    else
-                                    {
-
-                                        <span class="badge bg-success">Active</span>
-                                    }
-                                </small>
-                            </li>
-                        }
-                    </ul>
-                }
-            </div>
+        <div style="font-size:13px;color:var(--muted);text-align:right;">
+            <div>Complaint #@Model.ComplaintId</div>
+            <div>Updated @Model.UpdatedAt.ToString("dd MMM yyyy")</div>
+            @if (Model.ResolvedAt.HasValue) { <div style="color:var(--res);">Resolved @Model.ResolvedAt.Value.ToString("dd MMM yyyy")</div> }
         </div>
     </div>
-
-    <!-- RIGHT: Resolution Stages & Comments -->
-    <div class="col-md-5">
-
-        <!-- Resolution Stages -->
-        <div class="card mb-3">
-            <div class="card-header">Resolution Stages</div>
-            <div class="card-body">
-                @if (!Model.ResolutionStages.Any())
-                {
-                    <p class="text-muted">No stages added yet.</p>
-                }
-                else
-                {
-                    <ul class="list-group mb-3">
-                        @foreach (var stage in Model.ResolutionStages.OrderBy(s => s.CreatedAt))
-                        {
-                            <li class="list-group-item">
-                                <div class="d-flex justify-content-between">
-                                    <strong>@stage.Title</strong>
-                                    <form asp-action="Delete" asp-controller="ResolutionStages" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@stage.StageId" />
-                                        <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Delete this stage?')">
-                                            ×
-                                        </button>
-                                    </form>
-                                </div>
-                                <small class="text-muted">@stage.Staff.FullName · @stage.CreatedAt.ToString("dd MMM HH:mm")</small>
-                                @if (!string.IsNullOrEmpty(stage.Description))
-                                {
-                                    <p class="mb-0 mt-1">@stage.Description</p>
-                                }
-                            </li>
-                        }
-                    </ul>
-                }
-
-                <!-- Add Stage -->
-                <form asp-action="Create" asp-controller="ResolutionStages" method="post">
-                    <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
-                    <div class="mb-2">
-                        <input type="text" name="title" class="form-control" placeholder="Stage title (e.g. Inspected)" required />
-                    </div>
-                    <div class="mb-2">
-                        <textarea name="description" class="form-control" rows="2" placeholder="Details (optional)"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Add Stage</button>
-                </form>
-            </div>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:14px;line-height:1.7;">@Model.Description</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;">
+    <div>
+        <div class="cc-card" style="margin-bottom:1rem;"><div class="cc-card-header">Update status</div><form asp-action="UpdateStatus" asp-controller="Complaints" method="post" style="display:flex;gap:8px;"><input type="hidden" name="id" value="@Model.ComplaintId"/><select name="status" class="form-select" style="flex:1;">@foreach(var s in (List<string>)ViewBag.ValidStatuses){<option value="@s" selected="@(Model.Status==s)">@SLabel(s)</option>}</select><button type="submit" class="cc-btn-primary">Save</button></form></div>
+        <div class="cc-card" style="margin-bottom:1rem;"><div class="cc-card-header">Update urgency</div><form asp-action="UpdateUrgency" asp-controller="Complaints" method="post" style="display:flex;gap:8px;"><input type="hidden" name="id" value="@Model.ComplaintId"/><select name="urgency" class="form-select" style="flex:1;">@foreach(var u in (List<string>)ViewBag.ValidUrgencies){<option value="@u" selected="@(Model.Urgency==u)">@u</option>}</select><button type="submit" class="cc-btn-primary">Save</button></form></div>
+        <div class="cc-card" style="margin-bottom:1rem;"><div class="cc-card-header">Assign department</div><form asp-action="UpdateDepartment" asp-controller="Complaints" method="post" style="display:flex;gap:8px;"><input type="hidden" name="id" value="@Model.ComplaintId"/><select name="departmentId" class="form-select" style="flex:1;" asp-items="ViewBag.Departments"><option value="">-- None --</option></select><button type="submit" class="cc-btn-primary">Save</button></form></div>
+        <div class="cc-card" style="margin-bottom:1rem;">
+            <div class="cc-card-header">Assign staff</div>
+            @{ var active=Model.Assignments.FirstOrDefault(a=>a.IsActive); }
+            @if(active!=null){<div style="font-size:13px;color:var(--muted);margin-bottom:.75rem;">Currently: <strong style="color:var(--text);">@active.Staff.FullName</strong></div>}
+            <form asp-action="Assign" asp-controller="Complaints" method="post" style="display:flex;gap:8px;"><input type="hidden" name="complaintId" value="@Model.ComplaintId"/><select name="staffId" class="form-select" style="flex:1;" asp-items="ViewBag.StaffList"><option value="">-- Select staff --</option></select><button type="submit" class="cc-btn-primary">Assign</button></form>
+            @if(Model.Assignments.Count>1){<div style="margin-top:.75rem;font-size:12px;color:var(--muted);">History: @foreach(var a in Model.Assignments.OrderByDescending(a=>a.AssignedAt)){<div>@a.Staff.FullName — @a.AssignedAt.ToString("dd MMM yyyy") @(!a.IsActive?"(previous)":"✓")</div>}</div>}
         </div>
-        <!-- Comments -->
-        <div class="card">
-            <div class="card-header">Comments</div>
-            <div class="card-body">
-
-                @if (!Model.Comments.Any())
-                {
-                    <p class="text-muted">No comments yet.</p>
-                }
-                else
-                {
-                    @foreach (var c in Model.Comments.OrderBy(c => c.CreatedAt))
-                    {
-                        if (c.IsInternal && Context.Session.GetInt32("RoleId") != 1)
-                        {
-                            continue;
-                        }
-
-                        <div class="mb-2 p-2 border rounded @(c.IsInternal ? "bg-warning-subtle" : "")">
-                            <small>
-                                <strong>@c.User.FullName</strong>
-
-                                @if (c.IsInternal)
-                                {
-                                    <span class="badge bg-warning text-dark">Internal</span>
-                                }
-
-                                · @c.CreatedAt.ToString("dd MMM HH:mm")
-                            </small>
-
-                            <p class="mb-0">@c.Message</p>
-                        </div>
-                    }
-                }
-
-                <!-- ✅ FORM OUTSIDE LOOP -->
-                <hr />
-
-                <h6>Add Comment</h6>
-
+        <div class="cc-card">
+            <div class="cc-card-header">Add resolution stage</div>
+            <form asp-action="Create" asp-controller="ResolutionStages" method="post">
+                <input type="hidden" name="complaintId" value="@Model.ComplaintId"/>
+                <div class="form-group"><input type="text" name="title" class="form-control" placeholder="Stage title e.g. Inspected" required maxlength="200"/></div>
+                <div class="form-group"><textarea name="description" class="form-textarea form-control" rows="2" placeholder="Details (optional)" maxlength="500"></textarea></div>
+                <button type="submit" class="cc-btn-primary">Add stage</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <div class="cc-card" style="margin-bottom:1rem;">
+            <div class="cc-card-header">Resolution timeline</div>
+            @if(!Model.ResolutionStages.Any()){<div style="font-size:14px;color:var(--muted);">No stages yet.</div>}
+            else{<div style="position:relative;padding-left:1.25rem;border-left:2px solid var(--border);">@foreach(var stage in Model.ResolutionStages.OrderBy(s=>s.CreatedAt)){<div style="position:relative;margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);"><div style="position:absolute;left:-1.5rem;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid white;"></div><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div style="font-weight:500;font-size:14px;">@stage.Title</div><form asp-action="Delete" asp-controller="ResolutionStages" method="post"><input type="hidden" name="id" value="@stage.StageId"/><input type="hidden" name="complaintId" value="@Model.ComplaintId"/><button type="submit" class="cc-btn-danger" style="padding:2px 8px;font-size:12px;" onclick="return confirm('Delete this stage?')">×</button></form></div><div style="font-size:12px;color:var(--muted);">@stage.Staff.FullName · @stage.CreatedAt.ToString("dd MMM, HH:mm")</div>@if(!string.IsNullOrEmpty(stage.Description)){<div style="font-size:13px;margin-top:3px;">@stage.Description</div>}</div>}</div>}
+        </div>
+        <div class="cc-card">
+            <div class="cc-card-header">Comments</div>
+            @if(!Model.Comments.Any()){<div style="font-size:14px;color:var(--muted);margin-bottom:1rem;">No comments yet.</div>}
+            else{<div style="margin-bottom:1rem;">@foreach(var c in Model.Comments.OrderBy(c=>c.CreatedAt)){<div style="display:flex;gap:10px;margin-bottom:.75rem;@(c.IsInternal?"background:#FEFCE8;border-radius:6px;padding:8px;":"")"><div style="width:32px;height:32px;border-radius:50%;background:var(--open-bg);color:var(--open);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">@Initials(c.User.FullName)</div><div><div style="font-size:13px;font-weight:500;">@c.User.FullName @if(c.IsInternal){<span class="badge badge-high" style="margin-left:6px;font-size:11px;">Staff note</span>}<span style="font-weight:400;color:var(--muted);">· @c.CreatedAt.ToString("dd MMM, HH:mm")</span></div><div style="font-size:14px;margin-top:2px;">@c.Message</div></div></div>}</div>}
+            <div style="border-top:1px solid var(--border);padding-top:1rem;">
                 <form asp-action="AddComment" asp-controller="Complaints" method="post">
-                    <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
-
-                    <div class="mb-2">
-                        <textarea name="message" class="form-control" rows="2" placeholder="Write a comment..." required></textarea>
+                    <input type="hidden" name="complaintId" value="@Model.ComplaintId"/>
+                    <textarea name="message" class="form-textarea form-control" rows="3" placeholder="Write a comment..." required maxlength="1000"></textarea>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:.5rem;flex-wrap:wrap;">
+                        <button type="submit" class="cc-btn-primary">Add comment</button>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;"><input type="checkbox" name="isInternal" style="width:14px;height:14px;"/> Internal note (staff only)</label>
                     </div>
-
-                    @if (Context.Session.GetInt32("RoleId") == 1)
-                    {
-                        <div class="form-check mb-2">
-                            <input type="checkbox" name="isInternal" class="form-check-input" />
-                            <label class="form-check-label">Internal Note (staff only)</label>
-                        </div>
-                    }
-
-                    <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
                 </form>
-
             </div>
         </div>
     </div>

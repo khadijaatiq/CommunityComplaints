@@ -11,7 +11,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ✅ ADD SESSION
-builder.Services.AddSession();
+// FIX 6: Configure session with timeout and security options.
+// Default AddSession() had no expiry and no HttpOnly flag.
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;       // not accessible via JavaScript
+    options.Cookie.IsEssential = true;    // required for GDPR compliance
+    options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+});
 
 var app = builder.Build();
 

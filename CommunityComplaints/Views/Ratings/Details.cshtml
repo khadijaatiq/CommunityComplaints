@@ -1,48 +1,16 @@
-﻿@model CommunityComplaints.Models.Rating
-
-@{
-    ViewData["Title"] = "Details";
-}
-
-<h1>Details</h1>
-
-<div>
-    <h4>Rating</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Stars)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Stars)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Feedback)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Feedback)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Complaint)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Complaint.ComplaintId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Resident)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Resident.UserId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.RatingId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+@model CommunityComplaints.Models.Rating
+@{ ViewData["Title"]="Rating Details"; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card" style="max-width:560px;"><div class="cc-card-header">Rating details</div>
+    <div class="cc-field"><div class="cc-field-label">Complaint</div><div class="cc-field-value">#@Model.Complaint.ComplaintId</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Resident</div><div class="cc-field-value">@Model.Resident.FullName</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Stars</div><div class="cc-field-value">@string.Concat(Enumerable.Repeat("⭐", Model.Stars)) (@Model.Stars / 5)</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Feedback</div><div class="cc-field-value">@(string.IsNullOrEmpty(Model.Feedback) ? "—" : Model.Feedback)</div></div>
+    
+    <div class="cc-field"><div class="cc-field-label">Submitted</div><div class="cc-field-value">@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div></div>
+    
+    <div style="margin-top:1.25rem;display:flex;gap:8px;"><a class="cc-btn-outline" asp-action="Index">Back</a><a class="cc-btn-danger" asp-action="Delete" asp-route-id="@Model.RatingId">Delete</a></div>
 </div>

@@ -1,47 +1,20 @@
-﻿@model IEnumerable<CommunityComplaints.Models.AnnouncementRead>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ReadAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Announcement)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
+@model IEnumerable<CommunityComplaints.Models.AnnouncementRead>
+@{ ViewData["Title"]="Announcement Reads"; }
+<div class="cc-page-header"><div><div class="cc-page-title">Announcement Reads</div><div class="cc-page-sub">@Model.Count() record(s)</div></div></div>
+<div class="cc-card" style="padding:0;overflow:hidden;">
+<table class="cc-table">
+    <thead><tr><th>Announcement</th><th>User</th><th>Read at</th><th>Actions</th></tr></thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReadAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Announcement.AnnouncementId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.UserId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td style="font-weight:500;">#@item.Announcement.AnnouncementId</td>
+            <td style="color:var(--muted);">@item.User.FullName</td>
+            <td style="color:var(--muted);font-size:13px;">@item.ReadAt.ToString("dd MMM yyyy, HH:mm")</td>
+            <td style="white-space:nowrap;">
+                <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
-</table>
+</table></div>

@@ -1,24 +1,8 @@
-﻿@model CommunityComplaints.Models.Role
-
-@{
-    ViewData["Title"] = "Details";
-}
-
-<h1>Details</h1>
-
-<div>
-    <h4>Role</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.RoleId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+@model CommunityComplaints.Models.Role
+@{ ViewData["Title"]="Role Details"; }
+<div style="margin-bottom:1rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-action="Index">← Back</a></div>
+<div class="cc-card" style="max-width:520px;"><div class="cc-card-header">Role</div>
+    <div class="cc-field"><div class="cc-field-label">Name</div><div class="cc-field-value">@Model.Name</div></div>
+    
+    <div style="margin-top:1.25rem;display:flex;gap:8px;"><a class="cc-btn-primary" asp-action="Edit" asp-route-id="@Model.RoleId">Edit</a><a class="cc-btn-outline" asp-action="Index">Back</a></div>
 </div>

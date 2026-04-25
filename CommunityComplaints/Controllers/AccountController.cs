@@ -18,14 +18,17 @@ namespace CommunityComplaints.Controllers
 
         public IActionResult Register()
         {
+            if (HttpContext.Session.GetInt32("UserId") != null)
+                return RedirectToAction("Index", "Home");
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-
+            model.Email = model.Email.Trim().ToLower();
             var existingUser = _context.Users.FirstOrDefault(u => u.Email == model.Email);
             if (existingUser != null)
             {
@@ -46,8 +49,8 @@ namespace CommunityComplaints.Controllers
                 FullName = model.Name,
                 Email = model.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                UnitNumber = model.UnitNumber,
-                Phone = model.Phone,
+                UnitNumber = string.IsNullOrWhiteSpace(model.UnitNumber) ? null : model.UnitNumber.Trim(),
+                Phone = string.IsNullOrWhiteSpace(model.Phone) ? null : model.Phone.Trim(),
                 RoleId = role.RoleId,
                 IsActive = true,
                 CreatedAt = DateTime.Now
@@ -55,7 +58,7 @@ namespace CommunityComplaints.Controllers
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
+            TempData["Success"] = "Registration successful! Please log in.";
             return RedirectToAction("Login");
         }
 
@@ -63,30 +66,30 @@ namespace CommunityComplaints.Controllers
 
         public IActionResult Login()
         {
+            if (HttpContext.Session.GetInt32("UserId") != null)
+                return RedirectToAction("Index", "Home");
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == model.Email);
+            var user = _context.Users.FirstOrDefault(u => u.Email == model.Email.Trim().ToLower());
 
-            if (user == null || !user.IsActive)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-                ModelState.AddModelError("", "Invalid login");
+                ModelState.AddModelError("", "Invalid email or password");
                 return View(model);
             }
 
-            bool isValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
-
-            if (!isValid)
+            if (!user.IsActive)
             {
-                ModelState.AddModelError("", "Invalid login");
+                ModelState.AddModelError("", "Your account has been deactivated. Please contact support.");
                 return View(model);
             }
-
             HttpContext.Session.SetInt32("UserId", user.UserId);
             HttpContext.Session.SetString("UserName", user.FullName);
             HttpContext.Session.SetInt32("RoleId", user.RoleId);
@@ -110,13 +113,15 @@ namespace CommunityComplaints.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult VerifyEmail(VerifyEmailViewModel model)
         {
+            if (!ModelState.IsValid) return View(model);
             var user = _context.Users.FirstOrDefault(u => u.Email == model.Email);
 
             if (user == null)
             {
-                ModelState.AddModelError("", "User not found");
+                ModelState.AddModelError("", "No account found with that email address");
                 return View(model);
             }
 
@@ -125,12 +130,18 @@ namespace CommunityComplaints.Controllers
 
         public IActionResult ChangePassword(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+                return RedirectToAction("VerifyEmail");
+
             return View(new ChangePasswordViewModel { Email = email });
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
+            if (!ModelState.IsValid) return View(model);
+
             var user = _context.Users.FirstOrDefault(u => u.Email == model.Email);
 
             if (user == null)
@@ -138,11 +149,16 @@ namespace CommunityComplaints.Controllers
                 ModelState.AddModelError("", "User not found");
                 return View(model);
             }
+            if (BCrypt.Net.BCrypt.Verify(model.NewPassword, user.PasswordHash))
+            {
+                ModelState.AddModelError("NewPassword", "New password cannot be the same as your current password");
+                return View(model);
+            }
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
 
             await _context.SaveChangesAsync();
-
+            TempData["Success"] = "Password changed successfully. Please log in.";
             return RedirectToAction("Login");
         }
     }
