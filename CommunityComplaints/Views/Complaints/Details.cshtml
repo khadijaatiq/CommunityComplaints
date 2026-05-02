@@ -7,7 +7,35 @@
     string SLabel(string s) => s == "InProgress" ? "In Progress" : s;
     string Initials(string n) { var p=n.Split(' ',System.StringSplitOptions.RemoveEmptyEntries); return p.Length>=2?$"{p[0][0]}{p[^1][0]}".ToUpper():n[..Math.Min(2,n.Length)].ToUpper(); }
 }
-<div style="margin-bottom:1.25rem;"><a style="font-size:13px;color:var(--muted);text-decoration:none;" asp-controller="Complaints" asp-action="MyComplaints">← Back to my complaints</a></div>
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+    bool isStaff = roleId == 2; // adjust if your staff role id is different
+}
+
+<div style="margin-bottom:1.25rem;">
+
+    @if (isStaff)
+    {
+        <a style="font-size:13px;
+            color:var(--muted);
+            text-decoration:none;"
+               asp-controller="Complaints"
+               asp-action="All">
+            ← All complaints
+        </a>
+    }
+    else
+    {
+        <a style="font-size:13px;
+            color:var(--muted);
+            text-decoration:none;"
+               asp-controller="Complaints"
+               asp-action="Index">
+            ← My complaints
+        </a>
+    }
+
+</div>
 <div class="cc-card" style="margin-bottom:1rem;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
         <div>

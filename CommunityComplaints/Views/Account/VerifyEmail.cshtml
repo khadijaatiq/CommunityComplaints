@@ -1,0 +1,66 @@
+﻿@model CommunityComplaints.ViewModels.VerifyEmailViewModel
+
+@{
+    ViewData["Title"] = "Forgot password";
+    ViewData["Narrow"] = true;
+}
+
+<div class="cc-card">
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-size:22px;font-weight:600;margin-bottom:4px;">
+            Forgot password
+        </div>
+
+        <div style="font-size:14px;color:var(--muted);">
+            Enter your registered email address
+        </div>
+    </div>
+
+    <form asp-action="VerifyEmail" method="post">
+
+        <div asp-validation-summary="All"
+             class="cc-alert cc-alert-error">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="Email">
+                Email address
+            </label>
+
+            <input class="form-control"
+                   asp-for="Email"
+                   placeholder="you@example.com"
+                   autocomplete="email" />
+
+            <span class="field-error"
+                  asp-validation-for="Email">
+            </span>
+        </div>
+
+        <button type="submit"
+                class="cc-btn-primary cc-btn-primary-wide">
+            Verify Email
+        </button>
+
+    </form>
+
+    <p style="text-align:center;
+        font-size:13px;
+        color:var(--muted);
+        margin-top:1.25rem;">
+
+        Remember your password?
+
+        <a style="color:var(--accent);
+            text-decoration:none;"
+               asp-action="Login">
+            Sign in
+        </a>
+    </p>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

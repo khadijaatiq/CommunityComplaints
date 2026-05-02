@@ -29,10 +29,14 @@ namespace CommunityComplaints.Controllers
         {
             if (!ModelState.IsValid) return View(model);
             model.Email = model.Email.Trim().ToLower();
-            var existingUser = _context.Users.FirstOrDefault(u => u.Email == model.Email);
-            if (existingUser != null)
+            bool emailExists = _context.Users.Any(u => u.Email.ToLower() == model.Email);
+
+            if (emailExists)
             {
-                ModelState.AddModelError("", "Email already exists");
+                ModelState.AddModelError(
+                    "Email",
+                    "An account with this email already exists.");
+
                 return View(model);
             }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CommunityComplaints.Utilities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CommunityComplaints.ViewModels
 {
@@ -12,6 +13,7 @@ namespace CommunityComplaints.ViewModels
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Enter a valid email address")]
+        [StrictEmail(ErrorMessage = "Please enter a valid email address.")]
         [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
         [Display(Name = "Email Address")]
         public string Email { get; set; }
