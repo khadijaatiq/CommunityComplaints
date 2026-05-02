@@ -150,15 +150,35 @@ namespace CommunityComplaints.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == id);
 
-            if (user != null)
+            if (user == null) return NotFound();
+
+            var loggedInUser = await _context.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.UserId == HttpContext.Session.GetInt32("UserId"));
+
+            if (loggedInUser?.Role?.Name == "Staff" && user.Role?.Name == "Staff")
             {
-                _context.Users.Remove(user);
+                TempData["Error"] = "Staff members cannot delete other staff members.";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(m => m.UserId == id);
+
+            if (user == null) return NotFound();
+
+            return View(user);
+        }
+
     }
 }

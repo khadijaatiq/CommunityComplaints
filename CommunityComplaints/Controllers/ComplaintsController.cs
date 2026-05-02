@@ -303,24 +303,21 @@ namespace CommunityComplaints.Controllers
         // ================= ADD COMMENT =================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(int complaintId, string message, bool isInternal = false)
+        public async Task<IActionResult> AddComment(int complaintId, string message, string isInternal = "false")
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             int? roleId = HttpContext.Session.GetInt32("RoleId");
 
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            // Validate message not empty
             if (string.IsNullOrWhiteSpace(message))
             {
                 TempData["Error"] = "Comment cannot be empty";
-                // FIX 3: Residents must go to Details (not Manage which is staff-only)
                 return roleId == 1
                     ? RedirectToAction(nameof(Manage), new { id = complaintId })
                     : RedirectToAction(nameof(Details), new { id = complaintId });
             }
 
-            // Validate message length
             if (message.Trim().Length > 1000)
             {
                 TempData["Error"] = "Comment cannot exceed 1000 characters";
@@ -329,23 +326,21 @@ namespace CommunityComplaints.Controllers
                     : RedirectToAction(nameof(Details), new { id = complaintId });
             }
 
-            // Validate complaint exists
             var complaint = await _context.Complaints.FindAsync(complaintId);
             if (complaint == null) return NotFound();
 
-            // Residents can only comment on their own complaints
             if (roleId == 2 && complaint.ResidentId != userId)
                 return Forbid();
 
-            // Residents cannot add internal notes
-            if (roleId != 1) isInternal = false;
+            // Parse isInternal — only staff can mark as internal
+            bool isInternalBool = roleId == 1 && isInternal == "true";
 
             var comment = new Comment
             {
                 ComplaintId = complaintId,
                 UserId = userId.Value,
                 Message = message.Trim(),
-                IsInternal = isInternal,
+                IsInternal = isInternalBool,
                 CreatedAt = DateTime.Now
             };
 

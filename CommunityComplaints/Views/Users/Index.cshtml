@@ -1,24 +1,40 @@
 @model IEnumerable<CommunityComplaints.Models.User>
-@{ ViewData["Title"]="Users"; }
+@{
+    ViewData["Title"] = "Users";
+}
 <div class="cc-page-header"><div><div class="cc-page-title">Users</div><div class="cc-page-sub">@Model.Count() account(s)</div></div><a class="cc-btn-primary" asp-action="Create">+ New user</a></div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="cc-alert cc-alert-error">@TempData["Error"]</div>
+}
+
 <div class="cc-card" style="padding:0;overflow:hidden;">
-<table class="cc-table">
-    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Unit</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-    <tbody>
-        @foreach (var item in Model) {
-        <tr>
-            <td style="font-weight:500;">@item.FullName</td>
-            <td style="color:var(--muted);font-size:13px;">@item.Email</td>
-            <td><span class="badge @(item.Role?.Name=="Staff"?"badge-open":"badge-cancelled")">@item.Role?.Name</span></td>
-            <td style="color:var(--muted);">@(string.IsNullOrEmpty(item.UnitNumber)?"—":item.UnitNumber)</td>
-            <td>@if(item.IsActive){<span class="badge badge-resolved">Active</span>}else{<span class="badge badge-cancelled">Inactive</span>}</td>
-            <td style="color:var(--muted);font-size:13px;white-space:nowrap;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
-            <td style="white-space:nowrap;">
-                <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.UserId">Details</a>
-                <a class="cc-btn-outline" style="margin-left:6px;" asp-action="Edit" asp-route-id="@item.UserId">Edit</a>
-                <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
-            </td>
-        </tr>
+    <table class="cc-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Unit</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight:500;">@item.FullName</td>
+                    <td style="color:var(--muted);font-size:13px;">@item.Email</td>
+                    <td><span class="badge @(item.Role?.Name == "Staff" ? "badge-open" : "badge-cancelled")">@item.Role?.Name</span></td>
+                    <td style="color:var(--muted);">@(string.IsNullOrEmpty(item.UnitNumber) ? "—" : item.UnitNumber)</td>
+                    <td>@if(item.IsActive){
+                        <span class="badge badge-resolved">Active</span>
+                    }else
+                    {
+
+                        <span class="badge badge-cancelled">Inactive</span>
+                    }
+                </td>
+                <td style="color:var(--muted);font-size:13px;white-space:nowrap;">@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                <td style="white-space:nowrap;">
+                    <a class="cc-btn-outline" asp-action="Details" asp-route-id="@item.UserId">Details</a>
+                    <a class="cc-btn-outline" style="margin-left:6px;" asp-action="Edit" asp-route-id="@item.UserId">Edit</a>
+                    <a class="cc-btn-danger" style="margin-left:6px;" asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
+                </td>
+            </tr>
         }
     </tbody>
 </table></div>
